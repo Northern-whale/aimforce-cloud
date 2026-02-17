@@ -1,0 +1,168 @@
+{
+  "name": "DEMO: Eleven Labs Text-to-Speech Test",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "elevenlabs-test",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "elevenlabs-demo"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "text",
+              "value": "={{ $json.body.text || 'Здравствуйте! Это тестовое сообщение от голосового агента магазина премиальных сигар. Меня зовут Виктор.' }}"
+            },
+            {
+              "name": "voice_id",
+              "value": "={{ $json.body.voice_id || '21m00Tcm4TlvDq8ikWAM' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-variables",
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.elevenlabs.io/v1/text-to-speech/{{ $json.voice_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "={{ $env.ELEVEN_LABS_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "name": "model_id",
+              "value": "eleven_multilingual_v2"
+            },
+            {
+              "name": "voice_settings",
+              "value": "={\"stability\": 0.75, \"similarity_boost\": 0.85, \"style\": 0.3, \"use_speaker_boost\": true}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "elevenlabs-api",
+      "name": "Eleven Labs API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "file",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "audio/mpeg"
+              },
+              {
+                "name": "Content-Disposition",
+                "value": "attachment; filename=\"voice.mp3\""
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-webhook",
+      "name": "Return Audio File",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "content": "## 🎙️ Eleven Labs Demo\n\nЭтот workflow тестирует ваш API ключ Eleven Labs.\n\n**Как использовать:**\n1. Замените ELEVEN_LABS_API_KEY в .env\n2. Активируйте workflow\n3. Сделайте POST запрос на webhook URL:\n\n```bash\ncurl -X POST https://your-n8n.com/webhook/elevenlabs-test \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Привет! Это тест голоса.\"}' \\\n  --output voice.mp3\n```\n\n**Параметры:**\n- text: текст для озвучки\n- voice_id: ID голоса (опционально)\n\n**Голоса:**\n- Antoni: 21m00Tcm4TlvDq8ikWAM (мужской)\n- Bella: EXAVITQu4vr4xnSDxMaL (женский)",
+        "height": 400,
+        "width": 350
+      },
+      "id": "sticky-note",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [220, 80]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "Eleven Labs API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eleven Labs API": {
+      "main": [
+        [
+          {
+            "node": "Return Audio File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-14T00:00:00.000Z",
+  "versionId": "1"
+}

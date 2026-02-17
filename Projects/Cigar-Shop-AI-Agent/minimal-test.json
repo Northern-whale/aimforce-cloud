@@ -1,0 +1,50 @@
+{
+  "name": "Test Eleven Labs Voice",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "voice-test"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "webhookId": "voice-test-123",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "xi-api-key", "value": "ВАШ_API_КЛЮЧ"},
+            {"name": "Content-Type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.body.text || 'Привет! Это тест голоса от TARS.' }}\",\n  \"model_id\": \"eleven_multilingual_v2\"\n}",
+        "options": {
+          "response": {"response": {"responseFormat": "file"}}
+        }
+      },
+      "name": "Eleven Labs",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300],
+      "typeVersion": 4.1
+    },
+    {
+      "parameters": {"respondWith": "binary"},
+      "name": "Return MP3",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [650, 300],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Webhook": {"main": [[{"node": "Eleven Labs", "type": "main", "index": 0}]]},
+    "Eleven Labs": {"main": [[{"node": "Return MP3", "type": "main", "index": 0}]]}
+  }
+}

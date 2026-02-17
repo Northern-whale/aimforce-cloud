@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__n8n-mcp__search*",
+      "mcp__n8n-mcp__get*"
+    ],
+    "ask": [
+      "mcp__n8n-mcp__create*"
+    ],
+    "deny": [
+      "mcp__n8n-mcp__delete*"
+    ]
+  }
+}

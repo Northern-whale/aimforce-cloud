@@ -1,0 +1,39 @@
+# Конфиденциальные данные - API ключи и секреты
+.env
+.env.local
+.env.*.local
+*-config.json
+!.env.template
+
+# Системные файлы
+.DS_Store
+*.log
+*.tmp
+
+# Временные файлы TARS
+.claude/cache/
+.claude/temp/
+.claude/settings.local.json
+.claude/my-workflows-raw.json
+.claude/my-workflows.json
+.claude/worktrees/
+.claude/plans/
+
+# Next.js build output
+.next/
+
+# Node modules (если будут использоваться)
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.egg
+.pytest_cache/
+.ruff_cache/
+logs/

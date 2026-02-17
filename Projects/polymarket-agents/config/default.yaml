@@ -1,0 +1,19 @@
+# Polymarket Agents — Default Configuration
+# Env vars with POLY_ prefix override these values
+
+clob_host: "https://clob.polymarket.com"
+clob_private_key: ""
+clob_chain_id: 137
+
+gamma_host: "https://gamma-api.polymarket.com"
+subgraph_url: ""
+ws_url: "wss://ws-subscriptions-clob.polymarket.com/ws"
+
+mock_mode: true
+
+scan_interval_seconds: 300
+max_watchlist_size: 50
+min_opportunity_score: 20
+research_top_n: 5
+log_level: "INFO"
+audit_log_path: "logs/audit.jsonl"
