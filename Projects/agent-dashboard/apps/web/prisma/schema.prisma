@@ -42,18 +42,25 @@ model Message {
 }
 
 model CallLog {
-  id            String   @id @default(cuid())
-  externalId    String?  @unique
-  phoneNumber   String?
-  direction     String
-  status        String
-  duration      Int?
-  summary       String?
-  transcript    String?
-  sentiment     String?
-  transferredTo String?
-  metadata      String?
-  createdAt     DateTime @default(now())
+  id              String           @id @default(cuid())
+  externalId      String?          @unique
+  phoneNumber     String?
+  direction       String
+  status          String
+  duration        Int?
+  summary         String?
+  transcript      String?
+  sentiment       String?
+  transferredTo   String?
+  metadata        String?
+  category        String?          // product_inquiry, complaint, general, wholesale
+  aiResolved      Boolean          @default(false)
+  transferred     Boolean          @default(false)
+  topicTags       String?          // JSON array
+  customerIntent  String?          // buying, browsing, complaining, information
+  createdAt       DateTime         @default(now())
+  
+  productMentions ProductMention[]
 }
 
 model Metric {
@@ -74,4 +81,47 @@ model Event {
   payload   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model Product {
+  id              String           @id @default(cuid())
+  name            String
+  brand           String
+  origin          String           // Cuban, Dominican, Nicaraguan
+  price           Float            // in rubles
+  priceUSD        Float?           // optional USD equivalent
+  strength        String           // mild, medium, medium-full, full
+  length          Int?             // in mm
+  inStock         Boolean          @default(true)
+  stock           Int              @default(0)
+  description     String?
+  imageUrl        String?
+  category        String           // premium, standard, exclusive
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  productMentions ProductMention[]
+}
+
+model ProductMention {
+  id        String   @id @default(cuid())
+  callLogId String
+  productId String
+  mentions  Int      @default(1)
+  context   String?  // what customer asked about it
+  createdAt DateTime @default(now())
+  
+  callLog   CallLog  @relation(fields: [callLogId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model BusinessInsight {
+  id          String   @id @default(cuid())
+  type        String   // trending_product, peak_hour, customer_interest, revenue_opportunity
+  title       String
+  description String
+  data        String?  // JSON metadata
+  priority    String   @default("normal") // low, normal, high
+  actionable  Boolean  @default(false)
+  createdAt   DateTime @default(now())
 }

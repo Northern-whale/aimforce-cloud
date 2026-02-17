@@ -8,6 +8,8 @@ import {
   Phone,
   BarChart3,
   Settings,
+  Package,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +17,8 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/calls", label: "Calls", icon: Phone },
+  { href: "/products", label: "Products", icon: Package },
+  { href: "/analytics", label: "Analytics", icon: TrendingUp },
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
