@@ -1,216 +1,269 @@
-# HANDOFF.md — Tars Workspace
+# TARS — AI Business Assistant Workspace — Handoff Doc
 
-**Last updated:** 2026-02-16 (session 2 — agent-dashboard MVP)
-**Previous agent:** Claude Code (Opus 4.6) via VSCode extension
+## Overview
+
+**TARS** is a monorepo workspace for building AI-powered business automations and managing processes. Integrates with n8n (workflow automation) and contains multiple sub-projects.
+
+**Location:** `/Users/oybekabdualiev/Desktop/Tars`
+
+**Primary Language:** Russian for user-facing docs; English for code and technical docs.
 
 ---
 
-## 1. What Is This
+## Sub-Projects Summary
 
-Tars is an AI business assistant workspace. The main active project is an **AI voice agent for a cigar shop** — the first client for an AI agency business. The system answers phone calls via ElevenLabs, processes queries through n8n workflows with Anthropic Claude, logs calls to Google Sheets, and sends Telegram notifications to the business owner.
+### 1. **n8n-mcp** (`Projects/n8n-mcp/`)
+**What:** TypeScript MCP (Model Context Protocol) server providing AI assistants access to n8n node information.
+**Status:** Existing codebase (not modified in this session).
+**Has CLAUDE.md:** Yes (detailed architecture, commands, guidelines).
+
+### 2. **Cigar-Shop-AI-Agent** (`Projects/Cigar-Shop-AI-Agent/`)
+**What:** AI-powered customer service agent for a cigar shop built with n8n workflows + ElevenLabs voice.
+**Status:** Existing codebase (not modified in this session).
+
+### 3. **openclaw** (`Projects/openclaw/`)
+**What:** Unknown (existing project, not documented in this session).
+**Status:** Existing codebase (not modified in this session).
+
+### 4. **agent-dashboard** (`Projects/agent-dashboard/`)
+**What:** Unknown (existing project, not documented in this session).
+**Status:** Existing codebase (not modified in this session).
+
+### 5. **polymarket-agents** (`Projects/polymarket-agents/`) ✨ **NEW**
+**What:** Multi-agent system for scanning Polymarket prediction markets, gathering research, producing ranked opportunity watchlists.
+**Status:** **Phase 1 complete** — Nova orchestrator, Scanner, Researcher, data layer with mocks. 25 tests passing. Full end-to-end cycle working.
+**Has CLAUDE.md:** Yes.
+**Has HANDOFF.md:** Yes (detailed handoff in `Projects/polymarket-agents/HANDOFF.md`).
+**Language:** Python 3.11+ (using 3.12 venv).
 
 ---
 
-## 2. Project Structure
+## What Was Built/Changed (This Session)
+
+### Built from Scratch: Polymarket Opportunities Desk (Phase 1)
+
+**Created:** `Projects/polymarket-agents/` — Complete multi-agent trading research system.
+
+**Architecture:**
+- **Core framework:** Config loader, Pydantic models, abstract base agent, async message bus, audit logger
+- **Data layer:** Gamma API client, CLOB client, Subgraph client, WebSocket stub (polling), realistic mock data (6 sample markets)
+- **Agents:** Nova (orchestrator), Scanner (heuristic scoring), Researcher (curated sources)
+- **Tests:** 25 passing tests covering config, models, data clients, full agent integration
+- **Entry point:** CLI with `--once` and continuous modes
+
+**How to run:**
+```bash
+cd Projects/polymarket-agents
+source .venv/bin/activate
+python -m polymarket_agents --once    # one cycle
+pytest tests/ -v                      # 25 tests
+```
+
+**See:** `Projects/polymarket-agents/HANDOFF.md` for full details.
+
+### Modified: Root `.gitignore`
+
+**Added Python-specific patterns:**
+```
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.egg
+.pytest_cache/
+.ruff_cache/
+logs/
+```
+
+---
+
+## What's In Progress
+
+**Nothing in progress** — Polymarket Phase 1 is complete and working.
+
+**Next phases (not started):**
+- Phase 2: Strategy Engineer, Backtest Agent, real WebSocket feed
+- Phase 3: Paper Trading, Risk Manager, Security Agent
+- Phase 4: Execution Bot (live trading)
+
+---
+
+## API Keys / Config Locations
+
+### n8n Integration (Existing)
+- **Config:** `.claude/n8n-config.json` (gitignored)
+- **API credentials:** `.env` (gitignored)
+- **Template:** `.env.template`
+- **Connection status:** `.claude/n8n-connection-status.md`
+
+### Polymarket Agents (New)
+- **No real API keys needed yet** — runs in mock mode
+- **When adding credentials:**
+  - Copy `Projects/polymarket-agents/.env.template` to `Projects/polymarket-agents/.env`
+  - Fill in `POLY_CLOB_PRIVATE_KEY`, `POLY_SUBGRAPH_URL`
+  - Set `POLY_MOCK_MODE=false`
+- **Config:** `Projects/polymarket-agents/config/default.yaml` (non-secret defaults)
+- **Venv:** `Projects/polymarket-agents/.venv/` (Python 3.12)
+
+### Other Projects
+- **openclaw:** Config may be in `~/.openclaw/.env` (user opened `~/.openclaw/openclaw.json` in IDE, suggesting external config)
+- **Cigar-Shop-AI-Agent:** Unknown (check project for `.env` or config files)
+- **agent-dashboard:** Unknown (check project for config)
+
+---
+
+## Repository Structure
 
 ```
-~/Desktop/Tars/
-├── CLAUDE.md              # Instructions for Claude Code
-├── HANDOFF.md             # This file
-├── .env                   # Local env vars (gitignored)
-├── .env.template          # Template for env vars
-├── .gitignore
-├── .claude/               # Claude Code config, n8n connection, permissions
-│   ├── permissions.json   # MCP permission model (allow search/get, ask create, deny delete)
-│   ├── n8n-config.json    # n8n API config (gitignored)
-│   ├── n8n-connection-status.md
-│   └── plans/             # Implementation plans
-├── Projects/
-│   ├── Cigar-Shop-AI-Agent/  # Active — voice agent for cigar shop
-│   ├── n8n-mcp/              # Reference — TypeScript MCP server for n8n (v2.35.2)
-│   ├── openclaw/             # Reference — personal AI assistant platform
-│   ├── agent-dashboard/      # Early stage — Next.js dashboard for agents
-│   └── polymarket-agents/    # Early stage — Python prediction market scanner
-├── docs/                  # Setup guides, examples, analysis
-└── README.md
+Tars/
+├── .claude/                # Claude Code config, n8n connection, permissions
+├── .env                    # Environment variables (gitignored)
+├── .env.template           # Template for env vars
+├── .gitignore              # Git ignore rules (updated with Python patterns)
+├── CLAUDE.md               # Repository-wide guidance for Claude
+├── HANDOFF.md              # This file
+├── README.md               # Repository overview
+├── Projects/               # Sub-projects
+│   ├── n8n-mcp/            # TypeScript MCP server for n8n (has CLAUDE.md)
+│   ├── Cigar-Shop-AI-Agent/
+│   ├── openclaw/
+│   ├── agent-dashboard/
+│   └── polymarket-agents/  # NEW: Python multi-agent system (has CLAUDE.md + HANDOFF.md)
+├── docs/                   # Documentation
+├── templates/              # Workflow templates
+├── prompts/                # AI prompts
+└── archive/                # Archived materials
 ```
 
 ---
 
-## 3. Cigar Shop AI Agent — MAIN PROJECT
+## Git Status
 
-### What was built
+**Branch:** `main` (no commits yet — this is a fresh repository)
 
-A complete voice agent pipeline with 3 n8n workflows on `https://n8n.srv1378974.hstgr.cloud`:
+**Untracked files:**
+- `.claude/`, `.env.template`, `.gitignore`, `CLAUDE.md`, `Projects/`, `README.md`, `docs/`
 
-| Workflow | ID | Status | Purpose |
-|----------|-----|--------|---------|
-| **Cigar Shop Voice Agent** | `pxTG3FeekTOoNsSs` | ACTIVE | Webhook receives ElevenLabs prompts, responds via Anthropic Claude with cigar shop knowledge |
-| **Cigar Shop Call Logger** | `VazpWJo19Vo4nMGp` | ACTIVE | Logs calls to Google Sheets + sends Telegram notifications for leads/transfers |
-| **Cigar Shop Daily Report** | `64l2UYX9K1vG0VCn` | INACTIVE | Scheduled 9PM daily — reads call logs, AI summarizes, sends Telegram report |
-
-### Voice Agent details
-- **Webhook:** `POST https://n8n.srv1378974.hstgr.cloud/webhook/elevenlabs-voice-agent`
-- **Body:** `{"prompt": "...", "sessionId": "..."}`
-- **LLM:** Anthropic Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)
-- **Persona:** Viktor — Russian-speaking cigar expert
-- **Knowledge base:** Full inventory with prices (Cohiba, Montecristo, Romeo y Julieta, Partagas, Davidoff, Arturo Fuente, Padron), store hours, delivery info, transfer triggers
-- **Tested and working** — responds correctly in Russian with prices
-
-### Call Logger details
-- **Webhook:** `POST https://n8n.srv1378974.hstgr.cloud/webhook/call-logger`
-- **Telegram:** Sends to chat ID `5273526040` via `@Aim4000_bot`
-- **Google Sheets:** Configured but OAuth NOT authorized (see "In Progress" below)
-- **Error handling:** `onError: continueRegularOutput` on Google Sheets node so Telegram still works even without Sheets
-- **Tested and working** — Telegram notifications confirmed received
-
-### ElevenLabs Agent
-- **Agent ID:** `agent_2501kh7k6xt8e5rv1tqqsxje2c9c`
-- **Agent name:** "Receptionist for Edwards" (Edwards Pipe & Tobacco, Englewood CO)
-- **LLM:** gemini-2.5-flash (ElevenLabs-side)
-- **Phone:** `+18337733584` (Twilio)
-- **Custom tool:** `tool_0601khm2960ze9y9htjwr0zky4hz` — webhook POST to n8n Voice Agent workflow
-- **Tool created via:** `POST https://api.elevenlabs.io/v1/convai/tools` then added to agent via `PATCH /v1/convai/agents/{id}` with `tool_ids` array
-
-### Key files
-- `Projects/Cigar-Shop-AI-Agent/knowledge-base.json` — cigar inventory, prices, FAQ, transfer triggers
-- `Projects/Cigar-Shop-AI-Agent/AI-AGENT-PROMPTS.md` — system prompts, function defs, voice settings, test scenarios
-- `Projects/Cigar-Shop-AI-Agent/README.md` — project overview and architecture
-- `Projects/Cigar-Shop-AI-Agent/workflow-demo-elevenlabs.json` — ElevenLabs TTS demo workflow
+**Ready to commit:**
+- All files staged for initial commit below
 
 ---
 
-## 4. What's In Progress
+## Next Steps (Recommended)
 
-### Google Sheets OAuth2 (BLOCKED — needs browser)
-The Google Sheets credential exists in n8n (`aMGRYUFEwtx3AHFM`) with client ID/secret, but the OAuth2 token exchange was never completed. The user needs to:
+1. **Review handoff docs:**
+   - Read `Projects/polymarket-agents/HANDOFF.md` (comprehensive)
+   - Read `Projects/polymarket-agents/CLAUDE.md` (development guide)
 
-1. **Add redirect URI** in Google Cloud Console → APIs & Services → Credentials → OAuth Client:
+2. **Test the system:**
+   ```bash
+   cd Projects/polymarket-agents
+   source .venv/bin/activate
+   python -m polymarket_agents --once
+   pytest tests/ -v
    ```
-   https://n8n.srv1378974.hstgr.cloud/rest/oauth2-credential/callback
-   ```
-2. **Enable Google Sheets API** in Google Cloud Console if not already
-3. **Open n8n UI** → Credentials → "Google Sheets" → Click "Sign in with Google"
-4. **Spreadsheet already created:** `https://docs.google.com/spreadsheets/d/1VHWjVqSQRe3VOY9EMSUn3dlb4iH3liawILatwI9HNkc/edit`
-   - Needs sheet tab renamed to "Call Logs"
-   - Needs headers: timestamp, session_id, topic, resolved, transferred, transfer_reason, lead_captured, lead_name, lead_contact, lead_interest, summary, business_id
-   - URL already set in both workflow nodes
 
-### Daily Report workflow (NOT ACTIVATED)
-- Workflow `64l2UYX9K1vG0VCn` is built but inactive
-- Depends on Google Sheets working (reads call logs)
-- Activate after Google Sheets OAuth is complete
+3. **Continue development:**
+   - See implementation plan: `~/.claude/plans/sleepy-wiggling-taco.md`
+   - Phase 2 adds Strategy Engineer, Backtest Agent, real WebSocket feed
 
----
+4. **Document other projects:**
+   - Create HANDOFF.md files for `n8n-mcp`, `Cigar-Shop-AI-Agent`, `openclaw`, `agent-dashboard`
+   - Identify API key locations for each
 
-## 5. API Keys & Config Locations
-
-### Agent Dashboard secrets
-`Projects/agent-dashboard/apps/web/.env` — contains:
-- `DATABASE_URL` — SQLite path (`file:./prisma/dev.db`)
-- `NEXTAUTH_SECRET` — JWT signing secret
-- `OWNER_EMAIL` / `OWNER_PASSWORD` — Dashboard login credentials
-- `ANTHROPIC_API_KEY` — Claude API key for chat
-
-### Primary secrets file
-`~/.openclaw/.env` — contains:
-- `ANTHROPIC_API_KEY` — Anthropic API key (`sk-ant-oat01-...`)
-- `TELEGRAM_BOT_TOKEN` — Original bot `8213558124:...`
-- `GOOGLE_CLIENT_ID` — Google OAuth client ID
-- `GOOGLE_CLIENT_SECRET` — Google OAuth client secret
-
-### Other secrets (NOT in files, used via n8n or direct API)
-- **n8n API key:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...HatrpuIcrM7G4ojK9i8pdfIZvZJUOFmWsFFB8ALxuDA` (header: `X-N8N-API-KEY`)
-- **n8n MCP token:** JWT in `N8N_MCP_TOKEN` (for MCP server at `/mcp-server/http`)
-- **ElevenLabs API key:** `sk_379a53efc52bf060f900bc6b222a52c2ae506e0a7579d92a`
-- **Tars Telegram Bot token:** `8402224558:AAHm8of8e4qj12WCUIH5qt3FVR-3Q6DFtA8` (`@Aim4000_bot`)
-- **Perplexity API key:** stored in `~/.openclaw/.env` (was there, may have been removed in recent edit)
-
-### n8n Credentials (created via REST API)
-| Name | ID | Type | Status |
-|------|-----|------|--------|
-| Anthropic account | `Obw7plw4OoAF2WaN` | anthropicApi | Working (on Voice Agent) |
-| Anthropic account 2 | `d6TiGFroExDDWaGA` | anthropicApi | Working (on Daily Report) |
-| Tars Telegram Bot | `eQ5hAMH6UUVYrVf7` | telegramApi | Working (token: `8402224558:...`) |
-| Google Sheets | `aMGRYUFEwtx3AHFM` | googleSheetsOAuth2Api | NOT AUTHORIZED (needs browser OAuth) |
-
-### n8n Instance
-- **URL:** `https://n8n.srv1378974.hstgr.cloud`
-- **MCP endpoint:** `https://n8n.srv1378974.hstgr.cloud/mcp-server/http` (Bearer token auth)
-- **REST API:** Standard REST with `X-N8N-API-KEY` header
-- **Owner:** Oybek Abdualiev (`ibk4business@gmail.com`)
-
-### OpenClaw config
-- `~/.openclaw/openclaw.json` — Nova agent config, Telegram channel, gateway settings
-- Nova agent uses Anthropic Claude Sonnet 4.5
+5. **Initial git commit:**
+   - Commit all current work to establish baseline
+   - See commands below
 
 ---
 
-## 6. Next Tasks (Planned)
+## Quick Reference
 
-### Immediate
-1. Complete Google Sheets OAuth2 authorization (browser required)
-2. Add headers to spreadsheet "Call Logs" tab
-3. Activate Daily Report workflow (`64l2UYX9K1vG0VCn`)
-4. End-to-end test: call phone number → AI responds → logged to Sheets → Telegram notification
+### Project Paths
+- **Tars monorepo:** `/Users/oybekabdualiev/Desktop/Tars`
+- **n8n MCP server:** `Projects/n8n-mcp/`
+- **Polymarket agents:** `Projects/polymarket-agents/`
+- **Claude memory:** `~/.claude/projects/-Users-oybekabdualiev-Desktop-Tars/memory/`
+- **Implementation plans:** `~/.claude/plans/`
 
-### Phase 2 — Agent Dashboard (MVP COMPLETE)
-The owner web dashboard is now fully built at `Projects/agent-dashboard/`:
-- **Dashboard:** KPI cards (calls, conversations, avg duration, response time) + recent calls
-- **Chat:** Full streaming chat with Claude Sonnet 4.5, conversation persistence, sidebar
-- **Call Logs:** Status-coded table with sentiment, duration, phone numbers
-- **Reports:** Metric cards + sentiment breakdown bars
-- **Auth:** NextAuth.js v5 credentials (login: `owner@tars.ai` / `tars2026`)
-- **API:** Streaming chat, conversations CRUD, reports, n8n webhook receiver
-- **DB:** SQLite via Prisma with 7 tables, seeded with sample data
-- **Stack:** Next.js 16 + Tailwind v4 + Prisma 6 + Claude API + pnpm/Turborepo
+### Key Files
+- **Root guidance:** `CLAUDE.md` (repository-wide rules)
+- **Root handoff:** `HANDOFF.md` (this file)
+- **Polymarket handoff:** `Projects/polymarket-agents/HANDOFF.md`
+- **Polymarket guidance:** `Projects/polymarket-agents/CLAUDE.md`
+- **Git ignore:** `.gitignore` (includes Python patterns now)
 
-**To run:** `cd Projects/agent-dashboard/apps/web && pnpm dev` → `localhost:3000`
-
-**Next steps for dashboard:**
-1. Voice input (Web Speech API mic button + Whisper fallback)
-2. Voice output (TTS for AI responses)
-3. Mobile app (Expo React Native)
-4. Real-time SSE notifications from n8n
-5. Recharts time-series charts + CSV export
-
-### Phase 3 (planned, not started)
-- Multi-business templating (clone workflows per client, shared infra)
-- Onboarding flow for new business clients
-
-### Phase 4 (planned, not started)
-- Nova as meta-agent monitoring all business agents
+### Python Environment (Polymarket)
+- **Python version:** 3.12.12 (installed via Homebrew)
+- **Venv location:** `Projects/polymarket-agents/.venv/`
+- **Activate:** `source Projects/polymarket-agents/.venv/bin/activate`
 
 ---
 
-## 7. Test Commands
+## Commit Commands
 
-### Voice Agent (working)
 ```bash
-curl -X POST https://n8n.srv1378974.hstgr.cloud/webhook/elevenlabs-voice-agent \
-  -H "Content-Type: application/json" \
-  -d '{"prompt":"Какие кубинские сигары есть?","sessionId":"test-1"}'
-```
+# Stage all files
+git add .
 
-### Call Logger (working — Telegram only, Sheets needs OAuth)
-```bash
-curl -X POST https://n8n.srv1378974.hstgr.cloud/webhook/call-logger \
-  -H "Content-Type: application/json" \
-  -d '{"topic":"pricing","resolved":true,"transferred":false,"lead_captured":true,"lead_name":"Test","lead_contact":"+70001112233","lead_interest":"Cohiba","summary":"Test call","session_id":"test-1","business_id":"cigar-shop-1"}'
-```
+# Commit with message
+git commit -m "$(cat <<'EOF'
+Initial commit: TARS workspace with Polymarket Agents Phase 1
 
-### Telegram Bot check
-```bash
-curl https://api.telegram.org/bot8402224558:AAHm8of8e4qj12WCUIH5qt3FVR-3Q6DFtA8/getMe
+- Add repository structure (n8n-mcp, Cigar-Shop-AI-Agent, openclaw, agent-dashboard)
+- Add Polymarket Opportunities Desk multi-agent system (Phase 1 complete)
+  - Core framework: config, models, base agent, message bus, audit logger
+  - Data layer: Gamma, CLOB, Subgraph clients with mock implementations
+  - Agents: Nova orchestrator, Scanner (heuristic scoring), Researcher (curated sources)
+  - Tests: 25 passing tests covering full system
+  - Entry point: CLI with --once and continuous modes
+- Add CLAUDE.md (repository-wide guidance)
+- Add HANDOFF.md (repository + polymarket handoff docs)
+- Update .gitignore with Python patterns
+
+Phase 1 verified working:
+- python -m polymarket_agents --once (full cycle in mock mode)
+- pytest tests/ -v (25/25 tests pass)
+- Audit log written to logs/audit.jsonl
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+EOF
+)"
+
+# If you want to push to remote (create repo first on GitHub/GitLab):
+# git remote add origin <your-repo-url>
+# git push -u origin main
 ```
 
 ---
 
-## 8. Known Issues / Gotchas
+## For the Next System/Person
 
-1. **n8n Set node v3.4** uses `assignments.assignments[]` format, NOT `fields.values[]`. The old format silently fails.
-2. **n8n webhook registration** requires a `webhookId` field on webhook nodes — without it, webhooks don't register even if the workflow shows `active: true`.
-3. **n8n `WorkflowHasIssuesError`** blocks execution before any node runs. Empty required fields (like Google Sheets URL) trigger this. Use `onError: continueRegularOutput` on problematic nodes AND fill in placeholder values.
-4. **ElevenLabs custom tools** must be created via dedicated `POST /v1/convai/tools` endpoint with `tool_config` wrapper, then added to agent via `tool_ids` array. Inline tool definitions in PATCH are silently dropped.
-5. **n8n credential creation** via REST API is picky: anthropicApi needs `header: false`, googleSheetsOAuth2Api needs `serverUrl`, `sendAdditionalBodyProperties`, `additionalBodyProperties` fields.
-6. **n8n MCP vs REST API** — MCP uses Bearer JWT token, REST API uses `X-N8N-API-KEY` header. They're different auth mechanisms.
+**What you need to know:**
+
+1. **Polymarket Agents is ready to use** — Phase 1 complete, 25 tests passing, runs in mock mode
+2. **No API credentials needed yet** — everything works with mock data
+3. **All decisions are logged** — check `Projects/polymarket-agents/logs/audit.jsonl`
+4. **Read the handoffs first** — `Projects/polymarket-agents/HANDOFF.md` has all the details
+5. **CLAUDE.md files guide development** — architecture, patterns, troubleshooting
+
+**Quick start:**
+```bash
+cd /Users/oybekabdualiev/Desktop/Tars/Projects/polymarket-agents
+source .venv/bin/activate
+python -m polymarket_agents --once
+```
+
+**Questions to answer:**
+- What are `openclaw` and `agent-dashboard`? (Document them)
+- Where are API keys for existing projects? (Create inventory)
+- What's the n8n instance URL? (Check `.env` or `.claude/n8n-config.json`)
+
+---
+
+**Last updated:** 2026-02-16
+**Created by:** Claude Sonnet 4.5 (Tars session)
