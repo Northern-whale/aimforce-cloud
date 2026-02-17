@@ -1,6 +1,7 @@
 """Nova — Orchestrator / Portfolio Governor.
 
 Owns the daily cycle, assigns work, reviews outputs, and compiles reports.
+Phase 2: Coordinates Strategy Engineer and Backtesting workflow.
 """
 
 from __future__ import annotations
@@ -12,7 +13,13 @@ from polymarket_agents.config import PolymarketConfig
 from polymarket_agents.core.base_agent import BaseAgent
 from polymarket_agents.core.logger import AuditLogger
 from polymarket_agents.core.message_bus import MessageBus
-from polymarket_agents.core.models import AgentMessage, Opportunity, SourceDossier
+from polymarket_agents.core.models import (
+    AgentMessage,
+    BacktestResult,
+    Opportunity,
+    SourceDossier,
+    Strategy,
+)
 from polymarket_agents.utils.formatting import format_daily_report
 
 
@@ -24,6 +31,8 @@ class NovaOrchestrator(BaseAgent):
         self.audit = AuditLogger(config.audit_log_path)
         self.watchlist: list[Opportunity] = []
         self.dossiers: list[SourceDossier] = []
+        self.strategies: list[Strategy] = []
+        self.backtest_results: list[BacktestResult] = []
         self._expected_dossiers = 0
         self._cycle_done: asyncio.Event = asyncio.Event()
 
@@ -66,6 +75,10 @@ class NovaOrchestrator(BaseAgent):
             await self._handle_watchlist(message)
         elif message.msg_type == "dossier":
             await self._handle_dossier(message)
+        elif message.msg_type == "strategies_ready":
+            await self._handle_strategies(message)
+        elif message.msg_type == "backtest_complete":
+            await self._handle_backtest_results(message)
 
     async def _handle_watchlist(self, message: AgentMessage) -> None:
         """Process watchlist from Scanner, dispatch research requests."""
@@ -110,3 +123,28 @@ class NovaOrchestrator(BaseAgent):
 
         if len(self.dossiers) >= self._expected_dossiers:
             self._cycle_done.set()
+
+    async def _handle_strategies(self, message: AgentMessage) -> None:
+        """Process strategies from Strategy Engineer."""
+        strategies_data = message.payload.get("strategies", [])
+        self.strategies = [Strategy.model_validate(s) for s in strategies_data]
+        
+        self.logger.info(f"Received {len(self.strategies)} strategies from Strategy Engineer")
+        self.audit.log("nova", "strategies_received", {
+            "count": len(self.strategies),
+            "types": [s.strategy_type.value for s in self.strategies],
+        })
+        
+        # Note: Backtesting is now handled by main loop, not here
+        # (to keep Nova focused on orchestration, not computation)
+
+    async def _handle_backtest_results(self, message: AgentMessage) -> None:
+        """Process backtest results."""
+        results_data = message.payload.get("results", [])
+        self.backtest_results = [BacktestResult.model_validate(r) for r in results_data]
+        
+        self.logger.info(f"Received {len(self.backtest_results)} backtest results")
+        self.audit.log("nova", "backtest_results_received", {
+            "count": len(self.backtest_results),
+            "avg_win_rate": sum(r.win_rate for r in self.backtest_results) / len(self.backtest_results) if self.backtest_results else 0,
+        })

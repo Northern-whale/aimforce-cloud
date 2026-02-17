@@ -54,7 +54,13 @@ class ScannerAgent(BaseAgent):
 
         self.logger.info(f"Watchlist: {len(self.watchlist)} opportunities (threshold={self.config.min_opportunity_score})")
 
+        # Send watchlist to Nova (orchestrator)
         await self.send("nova", "watchlist", {
+            "opportunities": [o.model_dump(mode="json") for o in self.watchlist],
+        })
+        
+        # Send watchlist to Strategy Engineer (Phase 2)
+        await self.send("strategy_engineer", "watchlist", {
             "opportunities": [o.model_dump(mode="json") for o in self.watchlist],
         })
 
