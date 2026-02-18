@@ -1,0 +1,202 @@
+{
+  "pet_store": {
+    "name": "Pet Store",
+    "character_archetype": "friendly_pet_mascot",
+    "recommended_character_types": ["mascot", "educator", "product_reviewer"],
+    "content_types": [
+      "product_review",
+      "pet_care_tip",
+      "store_tour",
+      "customer_pet_spotlight",
+      "ask_me_anything",
+      "seasonal_event"
+    ],
+    "sample_content_calendar": {
+      "monday": "Product Spotlight",
+      "wednesday": "Pet Care Tip",
+      "friday": "Customer Pet Feature",
+      "special": "Monthly store tour or event"
+    },
+    "hashtags": ["#petstore", "#petcare", "#denver pets", "#doglife", "#catlife", "#petproducts"]
+  },
+  "restaurant": {
+    "name": "Restaurant",
+    "character_archetype": "food_critic",
+    "recommended_character_types": ["product_reviewer", "tour_guide", "storyteller"],
+    "content_types": [
+      "menu_highlight",
+      "chef_special",
+      "behind_scenes",
+      "customer_testimonial",
+      "cooking_tip",
+      "seasonal_menu"
+    ],
+    "sample_content_calendar": {
+      "monday": "Menu Monday - Signature dish",
+      "wednesday": "Chef's Special Announcement",
+      "friday": "Behind the Scenes",
+      "weekend": "Customer feature or live event"
+    },
+    "hashtags": ["#foodie", "#denverfood", "#restaurant", "#chef", "#delicious", "#foodporn"]
+  },
+  "retail_boutique": {
+    "name": "Retail Boutique",
+    "character_archetype": "fashion_guide",
+    "recommended_character_types": ["tour_guide", "spokesperson", "educator"],
+    "content_types": [
+      "new_arrival",
+      "how_to_style",
+      "product_showcase",
+      "trend_alert",
+      "sale_announcement",
+      "customer_spotlight"
+    ],
+    "sample_content_calendar": {
+      "monday": "New Arrival Alert",
+      "wednesday": "Styling Tips",
+      "friday": "Weekend Shopping Inspo",
+      "special": "Flash sales, events"
+    },
+    "hashtags": ["#fashion", "#boutique", "#style", "#shopping", "#ootd", "#denver fashion"]
+  },
+  "coffee_shop": {
+    "name": "Coffee Shop",
+    "character_archetype": "barista_expert",
+    "recommended_character_types": ["educator", "product_reviewer", "storyteller"],
+    "content_types": [
+      "drink_spotlight",
+      "coffee_education",
+      "latte_art",
+      "customer_regular",
+      "bean_origin_story",
+      "seasonal_drink"
+    ],
+    "sample_content_calendar": {
+      "monday": "Monday Motivation Drink",
+      "wednesday": "Coffee Facts",
+      "friday": "Barista Showcase",
+      "special": "New seasonal drinks"
+    },
+    "hashtags": ["#coffee", "#cafe", "#barista", "#latteart", "#coffeelover", "#denvercoffee"]
+  },
+  "fitness_studio": {
+    "name": "Fitness Studio",
+    "character_archetype": "motivational_trainer",
+    "recommended_character_types": ["educator", "spokesperson", "tour_guide"],
+    "content_types": [
+      "workout_tip",
+      "success_story",
+      "class_preview",
+      "trainer_introduction",
+      "challenge_announcement",
+      "form_check"
+    ],
+    "sample_content_calendar": {
+      "monday": "Workout Monday - Exercise tip",
+      "wednesday": "Transformation Wednesday",
+      "friday": "Class Preview",
+      "special": "Monthly challenges"
+    },
+    "hashtags": ["#fitness", "#workout", "#gym", "#training", "#fitfam", "#denverfit"]
+  },
+  "salon": {
+    "name": "Salon & Spa",
+    "character_archetype": "beauty_expert",
+    "recommended_character_types": ["educator", "tour_guide", "product_reviewer"],
+    "content_types": [
+      "before_after",
+      "hair_care_tip",
+      "stylist_spotlight",
+      "product_recommendation",
+      "trend_showcase",
+      "appointment_promo"
+    ],
+    "sample_content_calendar": {
+      "tuesday": "Transformation Tuesday",
+      "thursday": "Hair Care Thursday",
+      "saturday": "Style Saturday",
+      "special": "Seasonal trends, promotions"
+    },
+    "hashtags": ["#salon", "#hair", "#beauty", "#hairstyle", "#beforeandafter", "#denverbeauty"]
+  },
+  "bakery": {
+    "name": "Bakery",
+    "character_archetype": "pastry_enthusiast",
+    "recommended_character_types": ["product_reviewer", "educator", "storyteller"],
+    "content_types": [
+      "daily_special",
+      "baking_process",
+      "recipe_tip",
+      "seasonal_treat",
+      "customer_favorite",
+      "custom_order_showcase"
+    ],
+    "sample_content_calendar": {
+      "daily": "Fresh Baked Today",
+      "wednesday": "Baking Process",
+      "friday": "Weekend Special",
+      "special": "Holiday treats, custom orders"
+    },
+    "hashtags": ["#bakery", "#pastry", "#baking", "#freshbaked", "#dessert", "#denverbakery"]
+  },
+  "bookstore": {
+    "name": "Bookstore",
+    "character_archetype": "literary_guide",
+    "recommended_character_types": ["educator", "tour_guide", "product_reviewer"],
+    "content_types": [
+      "book_recommendation",
+      "author_spotlight",
+      "genre_guide",
+      "reading_nook_tour",
+      "event_announcement",
+      "staff_pick"
+    ],
+    "sample_content_calendar": {
+      "monday": "Book Monday - New releases",
+      "wednesday": "Mid-week recommendation",
+      "friday": "Staff Pick Friday",
+      "special": "Author events, book clubs"
+    },
+    "hashtags": ["#bookstore", "#books", "#reading", "#bookworm", "#booklover", "#denverbooks"]
+  },
+  "auto_repair": {
+    "name": "Auto Repair Shop",
+    "character_archetype": "mechanic_expert",
+    "recommended_character_types": ["educator", "spokesperson", "tour_guide"],
+    "content_types": [
+      "maintenance_tip",
+      "before_after_repair",
+      "car_care_education",
+      "customer_testimonial",
+      "service_spotlight",
+      "seasonal_prep"
+    ],
+    "sample_content_calendar": {
+      "monday": "Maintenance Monday",
+      "wednesday": "Car Care Tip",
+      "friday": "Customer Story",
+      "special": "Seasonal prep (winter, summer)"
+    },
+    "hashtags": ["#autorepair", "#carmaintenance", "#mechanic", "#carcare", "#automotive", "#denverauto"]
+  },
+  "yoga_studio": {
+    "name": "Yoga Studio",
+    "character_archetype": "wellness_guide",
+    "recommended_character_types": ["educator", "spokesperson", "storyteller"],
+    "content_types": [
+      "pose_tutorial",
+      "mindfulness_tip",
+      "class_preview",
+      "teacher_introduction",
+      "student_journey",
+      "workshop_announcement"
+    ],
+    "sample_content_calendar": {
+      "monday": "Monday Mindfulness",
+      "wednesday": "Pose of the Week",
+      "friday": "Weekend Workshop Prep",
+      "special": "Challenges, retreats"
+    },
+    "hashtags": ["#yoga", "#wellness", "#mindfulness", "#meditation", "#namaste", "#denveryoga"]
+  }
+}

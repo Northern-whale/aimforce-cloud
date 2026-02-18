@@ -10,6 +10,7 @@ import {
   Settings,
   Package,
   TrendingUp,
+  Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/calls", label: "Calls", icon: Phone },
   { href: "/products", label: "Products", icon: Package },
+  { href: "/social", label: "Social Media", icon: Share2 },
   { href: "/analytics", label: "Analytics", icon: TrendingUp },
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },

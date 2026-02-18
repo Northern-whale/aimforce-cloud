@@ -1,0 +1,42 @@
+{
+  "script_id": "script-1771377949",
+  "title": "Pet Product Review - Pawsitive Pets Denver",
+  "character_id": "pawsitive-pets-denver-tulsi",
+  "business_type": "pet_store",
+  "content_format": "reel",
+  "hook": {
+    "name": "hook",
+    "duration_seconds": 3,
+    "content": "\ud83d\udc3e Hey pet parents! Tulsi here, and I just tried the ChewMaster Extreme Ball!",
+    "visual_cues": [],
+    "emphasis_words": []
+  },
+  "story": {
+    "name": "story",
+    "duration_seconds": 24,
+    "content": "So here's the deal - Ultra-durable rubber ball with treat compartment. As someone who knows good pet stuff, I gotta say it's fantastic and I highly recommend it. The best part? your items will stay in great condition! Plus the quality is excellent.",
+    "visual_cues": [],
+    "emphasis_words": []
+  },
+  "call_to_action": {
+    "name": "call_to_action",
+    "duration_seconds": 3,
+    "content": "Want to spoil your furry friend? Head to Pawsitive Pets Denver and check it out! Tell them Tulsi sent you! \ud83d\udc15",
+    "visual_cues": [],
+    "emphasis_words": []
+  },
+  "total_duration_seconds": 30,
+  "word_count": 78,
+  "tone": "playful",
+  "target_audience": "general",
+  "product_name": null,
+  "location": null,
+  "season_theme": null,
+  "keywords": [],
+  "hashtags": [],
+  "full_script": "\ud83d\udc3e Hey pet parents! Tulsi here, and I just tried the ChewMaster Extreme Ball!\n\nSo here's the deal - Ultra-durable rubber ball with treat compartment. As someone who knows good pet stuff, I gotta say it's fantastic and I highly recommend it. The best part? your items will stay in great condition! Plus the quality is excellent.\n\nWant to spoil your furry friend? Head to Pawsitive Pets Denver and check it out! Tell them Tulsi sent you! \ud83d\udc15",
+  "caption": null,
+  "description": null,
+  "created_at": "2026-02-17T18:25:49.151394",
+  "template_used": "pet_store_product_review"
+}

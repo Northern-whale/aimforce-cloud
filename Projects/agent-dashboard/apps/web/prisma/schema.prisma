@@ -8,14 +8,16 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  name          String?
-  passwordHash  String
-  role          String         @default("owner")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  conversations Conversation[]
+  id             String          @id @default(cuid())
+  email          String          @unique
+  name           String?
+  passwordHash   String
+  role           String          @default("owner")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  conversations  Conversation[]
+  socialAccounts SocialAccount[]
+  scheduledPosts ScheduledPost[]
 }
 
 model Conversation {
@@ -124,4 +126,46 @@ model BusinessInsight {
   priority    String   @default("normal") // low, normal, high
   actionable  Boolean  @default(false)
   createdAt   DateTime @default(now())
+}
+
+model SocialAccount {
+  id           String    @id @default(cuid())
+  userId       String
+  platform     String    // instagram, facebook, tiktok, linkedin, twitter
+  accountId    String    // platform-specific ID
+  accountName  String    // @username or page name
+  accessToken  String    // encrypted
+  refreshToken String?   // encrypted
+  expiresAt    DateTime?
+  connected    Boolean   @default(true)
+  metadata     String?   // JSON for platform-specific data
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, platform, accountId])
+}
+
+model ScheduledPost {
+  id           String    @id @default(cuid())
+  userId       String
+  platforms    String    // JSON array ["instagram", "facebook"]
+  content      String
+  mediaUrls    String?   // JSON array of media URLs
+  scheduledFor DateTime
+  status       String    @default("draft") // draft, scheduled, posting, posted, failed
+  postIds      String?   // JSON object { "instagram": "post_id", "facebook": "post_id" }
+  analytics    String?   // JSON object with platform analytics
+  error        String?   // Error message if failed
+  retryCount   Int       @default(0)
+  lastRetryAt  DateTime?
+  createdAt    DateTime  @default(now())
+  postedAt     DateTime?
+  updatedAt    DateTime  @updatedAt
+  
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([status, scheduledFor])
+  @@index([userId, status])
 }

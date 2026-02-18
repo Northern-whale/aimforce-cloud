@@ -1,0 +1,42 @@
+{
+  "script_id": "script-1771422690",
+  "title": "Pet Care Tip - Pawsitive Pets Denver",
+  "character_id": "pawsitive-pets-denver-tulsi",
+  "business_type": "pet_store",
+  "content_format": "short",
+  "hook": {
+    "name": "hook",
+    "duration_seconds": 3,
+    "content": "\ud83c\udf93 Quick pet tip! Tulsi here with something every pet parent should know!",
+    "visual_cues": [],
+    "emphasis_words": []
+  },
+  "story": {
+    "name": "story",
+    "duration_seconds": 14,
+    "content": "Did you know taking good care of your items makes them last longer? Here's the thing - proper maintenance is key. Try this: check regularly and clean as needed. Trust me, your items will stay in great condition!",
+    "visual_cues": [],
+    "emphasis_words": []
+  },
+  "call_to_action": {
+    "name": "call_to_action",
+    "duration_seconds": 3,
+    "content": "For more pet tips and amazing products, visit Pawsitive Pets Denver! Follow for more! \u2728",
+    "visual_cues": [],
+    "emphasis_words": []
+  },
+  "total_duration_seconds": 20,
+  "word_count": 66,
+  "tone": "playful",
+  "target_audience": "general",
+  "product_name": null,
+  "location": null,
+  "season_theme": null,
+  "keywords": [],
+  "hashtags": [],
+  "full_script": "\ud83c\udf93 Quick pet tip! Tulsi here with something every pet parent should know!\n\nDid you know taking good care of your items makes them last longer? Here's the thing - proper maintenance is key. Try this: check regularly and clean as needed. Trust me, your items will stay in great condition!\n\nFor more pet tips and amazing products, visit Pawsitive Pets Denver! Follow for more! \u2728",
+  "caption": null,
+  "description": null,
+  "created_at": "2026-02-18T06:51:30.395622",
+  "template_used": "pet_store_tip"
+}
