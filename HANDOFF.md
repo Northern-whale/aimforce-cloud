@@ -1,269 +1,236 @@
-# TARS — AI Business Assistant Workspace — Handoff Doc
+# TARS — Shared Context (Claude Code + Nova)
 
-## Overview
+**Purpose:** This file is the shared brain between Claude Code (VSCode coding agent) and Nova (OpenClaw agent on Telegram). Both agents read and update this file to stay in sync.
 
-**TARS** is a monorepo workspace for building AI-powered business automations and managing processes. Integrates with n8n (workflow automation) and contains multiple sub-projects.
-
-**Location:** `/Users/oybekabdualiev/Desktop/Tars`
-
-**Primary Language:** Russian for user-facing docs; English for code and technical docs.
+**Updated:** 2026-02-19
 
 ---
 
-## Sub-Projects Summary
+## How We Work Together
 
-### 1. **n8n-mcp** (`Projects/n8n-mcp/`)
-**What:** TypeScript MCP (Model Context Protocol) server providing AI assistants access to n8n node information.
-**Status:** Existing codebase (not modified in this session).
-**Has CLAUDE.md:** Yes (detailed architecture, commands, guidelines).
+### Claude Code (VSCode)
+- **Role:** Deep coding — reviews, debugging, writing code, running tests, research
+- **Location:** Runs in VSCode on `~/Desktop/Tars/`
+- **Memory:** `~/.claude/projects/-Users-oybekabdualiev-Desktop-Tars/memory/MEMORY.md`
+- **Strengths:** File editing, code analysis, test running, git operations
 
-### 2. **Cigar-Shop-AI-Agent** (`Projects/Cigar-Shop-AI-Agent/`)
-**What:** AI-powered customer service agent for a cigar shop built with n8n workflows + ElevenLabs voice.
-**Status:** Existing codebase (not modified in this session).
+### Nova (OpenClaw via Telegram)
+- **Role:** Project manager — coordination, planning, status tracking, proactive monitoring
+- **Location:** `~/.openclaw/workspace/`
+- **Memory:** `~/.openclaw/workspace/memory/` + `MEMORY.md`
+- **Strengths:** 24/7 availability, Telegram communication, task orchestration
 
-### 3. **openclaw** (`Projects/openclaw/`)
-**What:** Unknown (existing project, not documented in this session).
-**Status:** Existing codebase (not modified in this session).
-
-### 4. **agent-dashboard** (`Projects/agent-dashboard/`)
-**What:** Unknown (existing project, not documented in this session).
-**Status:** Existing codebase (not modified in this session).
-
-### 5. **polymarket-agents** (`Projects/polymarket-agents/`) ✨ **NEW**
-**What:** Multi-agent system for scanning Polymarket prediction markets, gathering research, producing ranked opportunity watchlists.
-**Status:** **Phase 1 complete** — Nova orchestrator, Scanner, Researcher, data layer with mocks. 25 tests passing. Full end-to-end cycle working.
-**Has CLAUDE.md:** Yes.
-**Has HANDOFF.md:** Yes (detailed handoff in `Projects/polymarket-agents/HANDOFF.md`).
-**Language:** Python 3.11+ (using 3.12 venv).
-
----
-
-## What Was Built/Changed (This Session)
-
-### Built from Scratch: Polymarket Opportunities Desk (Phase 1)
-
-**Created:** `Projects/polymarket-agents/` — Complete multi-agent trading research system.
-
-**Architecture:**
-- **Core framework:** Config loader, Pydantic models, abstract base agent, async message bus, audit logger
-- **Data layer:** Gamma API client, CLOB client, Subgraph client, WebSocket stub (polling), realistic mock data (6 sample markets)
-- **Agents:** Nova (orchestrator), Scanner (heuristic scoring), Researcher (curated sources)
-- **Tests:** 25 passing tests covering config, models, data clients, full agent integration
-- **Entry point:** CLI with `--once` and continuous modes
-
-**How to run:**
+### How Nova calls Claude Code
 ```bash
-cd Projects/polymarket-agents
-source .venv/bin/activate
-python -m polymarket_agents --once    # one cycle
-pytest tests/ -v                      # 25 tests
+# One-shot coding task
+bash pty:true workdir:~/Desktop/Tars/Projects/<project> command:"claude 'Your task'"
+
+# Background task with completion notification
+bash pty:true workdir:~/Desktop/Tars/Projects/<project> background:true command:"claude 'Your task. When done, run: openclaw system event --text \"Done: summary\" --mode now'"
 ```
 
-**See:** `Projects/polymarket-agents/HANDOFF.md` for full details.
+### How Claude Code leaves notes for Nova
+Update this HANDOFF.md file with:
+- What was done (completed work)
+- What's blocked (issues found)
+- What's next (recommended actions)
 
-### Modified: Root `.gitignore`
-
-**Added Python-specific patterns:**
-```
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-dist/
-build/
-.venv/
-venv/
-*.egg
-.pytest_cache/
-.ruff_cache/
-logs/
-```
+Nova reads this file at session start and during heartbeats.
 
 ---
 
-## What's In Progress
+## URGENT: Server Consolidation Migration (IN PROGRESS)
 
-**Nothing in progress** — Polymarket Phase 1 is complete and working.
+**Context:** Oybek is consolidating all infrastructure onto ONE server to replace scattered services (old Hostinger VPS, Railway, Vercel). This is the top priority task.
 
-**Next phases (not started):**
-- Phase 2: Strategy Engineer, Backtest Agent, real WebSocket feed
-- Phase 3: Paper Trading, Risk Manager, Security Agent
-- Phase 4: Execution Bot (live trading)
+### What was decided
+- **Server:** New Hostinger VPS KVM 4 (4 vCPU, 16GB RAM, 200GB NVMe)
+- **IP:** `77.37.67.2`
+- **Management:** Coolify (self-hosted PaaS, pre-installed via Hostinger template)
+- **Domain:** `aimforce.cloud`
+- **Goal:** One server + Coolify replaces Vercel + Railway + old Hostinger VPS
 
----
+### What's been completed
+1. New VPS created and running at `77.37.67.2`
+2. Coolify installed and accessible
+3. DNS A records created:
+   - `coolify.aimforce.cloud` → `77.37.67.2`
+   - `n8n.aimforce.cloud` → `77.37.67.2`
+   - `app.aimforce.cloud` → `77.37.67.2`
+4. Coolify instance domain set to `https://coolify.aimforce.cloud`
+5. PostgreSQL deployed on Coolify (replaces Railway) — **RUNNING**
+   - Database name: `aimforce`
+   - User: `aimforce`
+   - Internal hostname: `main-db`
+   - Port: 5432
+6. n8n service deployed on Coolify — **DEPLOYED BUT NOT LOADING**
 
-## API Keys / Config Locations
+### ✅ n8n FULLY OPERATIONAL (2026-02-19 22:30 UTC)
+- **Status:** ✅ WORKING & HEALTHY WITH HTTPS
+- **URL:** https://n8n.aimforce.cloud
+- **Certificate:** Let's Encrypt SSL (valid until May 20, 2026)
+- **Database:** Connected to PostgreSQL (user: aimforce, db: n8n)
+- **Issues Resolved:**
+  1. Network alias "main-db" configured correctly
+  2. PostgreSQL user created with proper permissions
+  3. Container starts without errors
+  4. ✅ Custom domain configured (n8n.aimforce.cloud)
+  5. ✅ HTTPS with Let's Encrypt certificate
+  6. ✅ HTTP → HTTPS redirect working
+  7. ✅ Traefik routing properly configured
+- **Fix Applied:** Updated docker-compose.yml with proper Traefik labels for HTTPS router and Let's Encrypt certificate resolver
+- **Verified:** Service accessible at https://n8n.aimforce.cloud (HTTP/2 200 OK)
 
-### n8n Integration (Existing)
-- **Config:** `.claude/n8n-config.json` (gitignored)
-- **API credentials:** `.env` (gitignored)
-- **Template:** `.env.template`
-- **Connection status:** `.claude/n8n-connection-status.md`
+### Nova's tasks (in order of priority)
 
-### Polymarket Agents (New)
-- **No real API keys needed yet** — runs in mock mode
-- **When adding credentials:**
-  - Copy `Projects/polymarket-agents/.env.template` to `Projects/polymarket-agents/.env`
-  - Fill in `POLY_CLOB_PRIVATE_KEY`, `POLY_SUBGRAPH_URL`
-  - Set `POLY_MOCK_MODE=false`
-- **Config:** `Projects/polymarket-agents/config/default.yaml` (non-secret defaults)
-- **Venv:** `Projects/polymarket-agents/.venv/` (Python 3.12)
+#### ✅ Task 1: Fix n8n deployment — COMPLETE
+**Completed:** 2026-02-19 22:30 UTC
+- Diagnosed issue: Traefik labels pointing to sslip.io instead of custom domain
+- Fixed: Updated docker-compose.yml with proper n8n.aimforce.cloud hostname
+- Added HTTPS support: Configured Let's Encrypt certificate resolver
+- Result: https://n8n.aimforce.cloud fully operational with valid SSL
 
-### Other Projects
-- **openclaw:** Config may be in `~/.openclaw/.env` (user opened `~/.openclaw/openclaw.json` in IDE, suggesting external config)
-- **Cigar-Shop-AI-Agent:** Unknown (check project for `.env` or config files)
-- **agent-dashboard:** Unknown (check project for config)
+#### Task 2: Migrate workflows from old VPS (READY)
+**Status:** ✅ Guide created, ready for manual execution
+- **Documentation:** `~/Desktop/Tars/Projects/aimforce/N8N-MIGRATION-GUIDE.md`
+- Old n8n instance: `https://n8n.srv1378974.hstgr.cloud`
+- New n8n instance: `https://n8n.aimforce.cloud` ✅ Ready
+- **Blocker:** Need old VPS SSH access or n8n login credentials
+- **Next:** Access old n8n, export workflows, import to new instance
 
----
+#### Task 3: Deploy AimForce Next.js app (READY TO DEPLOY)
+**Status:** ✅ Docker support added, ready to deploy
+- **Code:** `~/Desktop/Tars/Projects/aimforce/`
+- **GitHub:** https://github.com/Northern-whale/aimforce-cloud (latest push: Docker support)
+- **Documentation:** `COOLIFY-DEPLOY-GUIDE.md` (complete deployment instructions)
+- **Dockerfile:** ✅ Created and tested structure
+- **Environment vars:** ✅ Prepared at `/tmp/aimforce-production.env`
+- **Database URL:** `postgresql://aimforce:GrDKRpDRQSvYjOhWOb5rQEHah038Tvpm0isbtdKpz95G7ECcfbMaL6bSODgmvfz6@main-db:5432/aimforce`
+- **Next:** Deploy via Coolify dashboard at https://coolify.aimforce.cloud
 
-## Repository Structure
+#### Task 4: Update infrastructure references
+Once everything is migrated, update:
+- This HANDOFF.md with new URLs
+- Webhook URLs in ElevenLabs agent config
+- Any hardcoded references to old n8n URL (`n8n.srv1378974.hstgr.cloud`)
 
-```
-Tars/
-├── .claude/                # Claude Code config, n8n connection, permissions
-├── .env                    # Environment variables (gitignored)
-├── .env.template           # Template for env vars
-├── .gitignore              # Git ignore rules (updated with Python patterns)
-├── CLAUDE.md               # Repository-wide guidance for Claude
-├── HANDOFF.md              # This file
-├── README.md               # Repository overview
-├── Projects/               # Sub-projects
-│   ├── n8n-mcp/            # TypeScript MCP server for n8n (has CLAUDE.md)
-│   ├── Cigar-Shop-AI-Agent/
-│   ├── openclaw/
-│   ├── agent-dashboard/
-│   └── polymarket-agents/  # NEW: Python multi-agent system (has CLAUDE.md + HANDOFF.md)
-├── docs/                   # Documentation
-├── templates/              # Workflow templates
-├── prompts/                # AI prompts
-└── archive/                # Archived materials
-```
+### Services to cancel after migration
+- Old Hostinger VPS (srv1378974) — where old n8n runs
+- Railway PostgreSQL subscription
+- Vercel paid plan (if any)
 
----
-
-## Git Status
-
-**Branch:** `main` (no commits yet — this is a fresh repository)
-
-**Untracked files:**
-- `.claude/`, `.env.template`, `.gitignore`, `CLAUDE.md`, `Projects/`, `README.md`, `docs/`
-
-**Ready to commit:**
-- All files staged for initial commit below
-
----
-
-## Next Steps (Recommended)
-
-1. **Review handoff docs:**
-   - Read `Projects/polymarket-agents/HANDOFF.md` (comprehensive)
-   - Read `Projects/polymarket-agents/CLAUDE.md` (development guide)
-
-2. **Test the system:**
-   ```bash
-   cd Projects/polymarket-agents
-   source .venv/bin/activate
-   python -m polymarket_agents --once
-   pytest tests/ -v
-   ```
-
-3. **Continue development:**
-   - See implementation plan: `~/.claude/plans/sleepy-wiggling-taco.md`
-   - Phase 2 adds Strategy Engineer, Backtest Agent, real WebSocket feed
-
-4. **Document other projects:**
-   - Create HANDOFF.md files for `n8n-mcp`, `Cigar-Shop-AI-Agent`, `openclaw`, `agent-dashboard`
-   - Identify API key locations for each
-
-5. **Initial git commit:**
-   - Commit all current work to establish baseline
-   - See commands below
+### New infrastructure map (target state)
+| Service | URL | Status |
+|---------|-----|--------|
+| Coolify dashboard | https://coolify.aimforce.cloud | ✅ RUNNING |
+| PostgreSQL | internal (main-db:5432) | ✅ RUNNING |
+| n8n | https://n8n.aimforce.cloud | ✅ OPERATIONAL (SSL) |
+| AimForce app | https://app.aimforce.cloud | ⏳ NOT DEPLOYED |
 
 ---
 
-## Quick Reference
+## Active Projects
 
-### Project Paths
-- **Tars monorepo:** `/Users/oybekabdualiev/Desktop/Tars`
-- **n8n MCP server:** `Projects/n8n-mcp/`
-- **Polymarket agents:** `Projects/polymarket-agents/`
-- **Claude memory:** `~/.claude/projects/-Users-oybekabdualiev-Desktop-Tars/memory/`
-- **Implementation plans:** `~/.claude/plans/`
+### 1. Polymarket Trading Bot Evaluation (ACTIVE)
+- **Location:** `~/Desktop/Tars/Projects/polymarket-bots-eval/`
+- **Status:** 3 bots audited, security-checked, ready for deep code review
+- **Briefing:** `DEVELOPER-BRIEFING.md` (full audit + recommendations)
+- **Recommended bot:** `polymarket-trading-bot/` (98/98 tests, cleanest code, flash crash strategy)
+- **Next:** Claude Code to deep-review strategy code, evaluate viability
 
-### Key Files
-- **Root guidance:** `CLAUDE.md` (repository-wide rules)
-- **Root handoff:** `HANDOFF.md` (this file)
-- **Polymarket handoff:** `Projects/polymarket-agents/HANDOFF.md`
-- **Polymarket guidance:** `Projects/polymarket-agents/CLAUDE.md`
-- **Git ignore:** `.gitignore` (includes Python patterns now)
+### 2. Polymarket Agents (Phase 1 Complete)
+- **Location:** `~/Desktop/Tars/Projects/polymarket-agents/`
+- **Status:** Phase 1 done — Nova orchestrator, Scanner, Researcher, 25 tests passing
+- **Next phases:** Strategy Engineer, Backtesting, Paper Trading, Live Execution
 
-### Python Environment (Polymarket)
-- **Python version:** 3.12.12 (installed via Homebrew)
-- **Venv location:** `Projects/polymarket-agents/.venv/`
-- **Activate:** `source Projects/polymarket-agents/.venv/bin/activate`
+### 3. Cigar Shop AI Agent (Operational)
+- **Location:** `~/Desktop/Tars/Projects/Cigar-Shop-AI-Agent/`
+- **Status:** Built and running
+- **Stack:** n8n workflows + ElevenLabs voice + Twilio phone
 
----
+### 4. AimForce (In Progress)
+- **Location:** `~/Desktop/Tars/Projects/aimforce/`
+- **Status:** Deployment steps documented, needs review
 
-## Commit Commands
-
-```bash
-# Stage all files
-git add .
-
-# Commit with message
-git commit -m "$(cat <<'EOF'
-Initial commit: TARS workspace with Polymarket Agents Phase 1
-
-- Add repository structure (n8n-mcp, Cigar-Shop-AI-Agent, openclaw, agent-dashboard)
-- Add Polymarket Opportunities Desk multi-agent system (Phase 1 complete)
-  - Core framework: config, models, base agent, message bus, audit logger
-  - Data layer: Gamma, CLOB, Subgraph clients with mock implementations
-  - Agents: Nova orchestrator, Scanner (heuristic scoring), Researcher (curated sources)
-  - Tests: 25 passing tests covering full system
-  - Entry point: CLI with --once and continuous modes
-- Add CLAUDE.md (repository-wide guidance)
-- Add HANDOFF.md (repository + polymarket handoff docs)
-- Update .gitignore with Python patterns
-
-Phase 1 verified working:
-- python -m polymarket_agents --once (full cycle in mock mode)
-- pytest tests/ -v (25/25 tests pass)
-- Audit log written to logs/audit.jsonl
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
-EOF
-)"
-
-# If you want to push to remote (create repo first on GitHub/GitLab):
-# git remote add origin <your-repo-url>
-# git push -u origin main
-```
+### 5. Agent Dashboard
+- **Location:** `~/Desktop/Tars/Projects/agent-dashboard/`
+- **Status:** Existing, needs documentation
 
 ---
 
-## For the Next System/Person
+## Recent Activity Log
 
-**What you need to know:**
+### 2026-02-19 (MAJOR PROGRESS)
+**Morning:** Server consolidation started
+- New Hostinger VPS (77.37.67.2) + Coolify
+- DNS configured for aimforce.cloud (coolify, n8n, app subdomains)
+- PostgreSQL deployed on Coolify — running
+- n8n deployed on Coolify — container starts but doesn't respond (needs debugging)
 
-1. **Polymarket Agents is ready to use** — Phase 1 complete, 25 tests passing, runs in mock mode
-2. **No API credentials needed yet** — everything works with mock data
-3. **All decisions are logged** — check `Projects/polymarket-agents/logs/audit.jsonl`
-4. **Read the handoffs first** — `Projects/polymarket-agents/HANDOFF.md` has all the details
-5. **CLAUDE.md files guide development** — architecture, patterns, troubleshooting
+**22:30 UTC - n8n FIXED by Nova:**
+  - Diagnosed: Traefik routing to wrong domain (sslip.io instead of aimforce.cloud)
+  - Fixed: Updated docker-compose.yml with proper hostname and HTTPS configuration
+  - Added: Let's Encrypt SSL certificate with automatic HTTP→HTTPS redirect
+  - Verified: https://n8n.aimforce.cloud fully operational (HTTP/2 200 OK)
+  - **Result:** n8n ready for workflow migration ✅
 
-**Quick start:**
-```bash
-cd /Users/oybekabdualiev/Desktop/Tars/Projects/polymarket-agents
-source .venv/bin/activate
-python -m polymarket_agents --once
-```
+**22:50 UTC - AimForce Deployment Prep by Nova:**
+  - Created production Dockerfile for Next.js app
+  - Added .dockerignore for optimized builds
+  - Updated next.config.js with standalone output
+  - Pushed to GitHub: Northern-whale/aimforce-cloud
+  - Created comprehensive deployment guide (COOLIFY-DEPLOY-GUIDE.md)
+  - Prepared production environment variables
+  - **Result:** App ready to deploy via Coolify ✅
 
-**Questions to answer:**
-- What are `openclaw` and `agent-dashboard`? (Document them)
-- Where are API keys for existing projects? (Create inventory)
-- What's the n8n instance URL? (Check `.env` or `.claude/n8n-config.json`)
+**23:00 UTC - Complete Migration Documentation:**
+  - Created N8N-MIGRATION-GUIDE.md (workflow migration steps)
+  - Created INFRASTRUCTURE-CLEANUP.md (full decommissioning plan)
+  - Updated HANDOFF.md with all progress
+  - Documented rollback procedures
+  - **Result:** Complete migration playbook ready ✅
+
+**Summary:**
+- ✅ Phase 1 Complete: Infrastructure setup and n8n operational
+- ✅ Phase 2 Prep Complete: App Dockerized and ready to deploy
+- ⏳ Phase 2 Execution: Needs Coolify UI deployment (manual)
+- ⏳ Phase 3 Pending: n8n workflow migration (needs old VPS access)
+
+### 2026-02-18
+- Set up Claude Code <-> Nova integration
+- Updated Nova's TOOLS.md, PROJECTS.md with current state
+- Created this shared HANDOFF.md
+- Polymarket bots evaluation briefing completed (DEVELOPER-BRIEFING.md)
+
+### 2026-02-16
+- Nova bootstrapped on OpenClaw
+- Identity: AI Agent Manager
+- Polymarket Agents Phase 1 completed (25 tests passing)
 
 ---
 
-**Last updated:** 2026-02-16
-**Created by:** Claude Sonnet 4.5 (Tars session)
+## Infrastructure Quick Reference
+
+| Service | URL/ID |
+|---------|--------|
+| **NEW VPS** | 77.37.67.2 (Hostinger KVM 4, Coolify) |
+| Coolify | https://coolify.aimforce.cloud |
+| n8n (NEW - fixing) | https://n8n.aimforce.cloud |
+| n8n (OLD - to retire) | https://n8n.srv1378974.hstgr.cloud |
+| Telegram bot | @Aim4000_bot (chat ID: 5273526040) |
+| ElevenLabs agent | agent_2501kh7k6xt8e5rv1tqqsxje2c9c |
+| Phone | +18337733584 (Twilio) |
+| OpenClaw config | ~/.openclaw/openclaw.json |
+| Claude Code memory | ~/.claude/projects/-Users-oybekabdualiev-Desktop-Tars/memory/ |
+| Nova workspace | ~/.openclaw/workspace/ |
+
+---
+
+## Rules for Both Agents
+
+1. **Update this file** when completing significant work
+2. **Read this file** at the start of every session
+3. **Don't duplicate work** — check what the other agent already did
+4. **Nova delegates coding** to Claude Code via the `coding-agent` skill
+5. **Claude Code leaves status notes** here for Nova to pick up
+6. **Never commit secrets** — .env files are gitignored
