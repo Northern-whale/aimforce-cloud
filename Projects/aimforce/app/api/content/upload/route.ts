@@ -3,8 +3,12 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { prisma } from '@/lib/prisma'
 import { uploadFileToDrive, getOrCreateClientFolder } from '@/lib/google-drive'
+import { withRateLimit } from '@/lib/rate-limit'
 
-export async function POST(request: NextRequest) {
+// File size limit: 100MB
+const MAX_FILE_SIZE = 100 * 1024 * 1024
+
+async function handleUpload(request: NextRequest) {
   const session = await getServerSession(authOptions)
   
   if (!session || !session.user.clientId) {
@@ -17,6 +21,16 @@ export async function POST(request: NextRequest) {
     
     if (files.length === 0) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 })
+    }
+    
+    // Validate file sizes
+    for (const file of files) {
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          { error: `File "${file.name}" exceeds maximum size of 100MB` },
+          { status: 400 }
+        )
+      }
     }
     
     // Get client's Google Drive credentials
@@ -108,8 +122,11 @@ function getFileType(mimeType: string): string {
   return 'DOCUMENT'
 }
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
+// Export with rate limiting: 20 uploads per minute
+export const POST = withRateLimit(handleUpload, {
+  interval: 60 * 1000, // 1 minute
+  maxRequests: 20,
+})
+
+// Note: Next.js 16 App Router handles multipart/form-data automatically
+// No need for deprecated config export

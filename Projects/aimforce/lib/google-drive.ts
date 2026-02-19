@@ -71,9 +71,12 @@ export async function getOrCreateClientFolder(
 ) {
   const drive = await createDriveClient(accessToken)
   
+  // Escape single quotes in client name to prevent query injection
+  const escapedClientName = clientName.replace(/'/g, "\\'")
+  
   // Search for existing folder
   const response = await drive.files.list({
-    q: `name='${clientName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+    q: `name='${escapedClientName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
     fields: 'files(id, name)',
     spaces: 'drive',
   })

@@ -5,15 +5,16 @@ import { generateOAuthUrl, type PlatformType } from '@/lib/oauth-providers'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { platform: string } }
+  { params }: { params: Promise<{ platform: string }> }
 ) {
+  const { platform: platformParam } = await params
   const session = await getServerSession(authOptions)
   
   if (!session || !session.user.clientId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   
-  const platform = params.platform.toUpperCase() as PlatformType
+  const platform = platformParam.toLowerCase() as PlatformType
   
   // Generate random state for CSRF protection
   const state = JSON.stringify({

@@ -4,20 +4,32 @@ import { exchangeCodeForToken, type PlatformType } from '@/lib/oauth-providers'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { platform: string } }
+  { params }: { params: Promise<{ platform: string }> }
 ) {
+  const { platform } = await params
   const searchParams = request.nextUrl.searchParams
   const code = searchParams.get('code')
   const stateParam = searchParams.get('state')
+  const error = searchParams.get('error')
+  const errorDescription = searchParams.get('error_description')
+  
+  // Handle OAuth errors (user denied, etc.)
+  if (error) {
+    console.error(`OAuth error for ${platform}:`, error, errorDescription)
+    const errorMessage = error === 'access_denied' 
+      ? 'You denied access. Please try again and approve the connection.'
+      : `Authentication failed: ${errorDescription || error}`
+    return NextResponse.redirect(new URL(`/portal/social?error=${encodeURIComponent(errorMessage)}`, request.url))
+  }
   
   if (!code || !stateParam) {
-    return NextResponse.redirect('/portal/social?error=missing_code')
+    return NextResponse.redirect(new URL('/portal/social?error=missing_code', request.url))
   }
   
   try {
     // Decode state
     const state = JSON.parse(Buffer.from(stateParam, 'base64').toString())
-    const { clientId, platform } = state
+    const { clientId } = state
     
     // Exchange code for tokens
     const tokens = await exchangeCodeForToken(platform as PlatformType, code)
@@ -57,10 +69,10 @@ export async function GET(
     })
     
     // Redirect back to social page with success
-    return NextResponse.redirect('/portal/social?success=connected')
+    return NextResponse.redirect(new URL('/portal/social?success=connected', request.url))
   } catch (error) {
     console.error('OAuth callback error:', error)
-    return NextResponse.redirect('/portal/social?error=auth_failed')
+    return NextResponse.redirect(new URL('/portal/social?error=auth_failed', request.url))
   }
 }
 

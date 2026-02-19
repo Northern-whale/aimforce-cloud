@@ -29,7 +29,6 @@ export default function LoginPage() {
         return
       }
 
-      // Redirect based on role - will be handled by middleware
       router.push('/')
       router.refresh()
     } catch (err) {
@@ -39,81 +38,131 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50">
-      <div className="w-full max-w-md">
-        <div className="bg-white shadow-2xl rounded-2xl p-8">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              AIMForce
-            </h1>
-            <p className="text-gray-600 mt-2">Your AI Workforce</p>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 px-4 sm:px-6 lg:px-8">
+      {/* Login Container - Explicitly sized */}
+      <div className="w-full max-w-[440px] mx-auto">
+        {/* Card - Professional shadow and spacing */}
+        <div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
+          {/* Header Section */}
+          <div className="px-8 pt-10 pb-6 text-center bg-gradient-to-br from-white to-blue-50/30">
+            {/* Logo */}
+            <div className="mb-3">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent tracking-tight">
+                AIMForce
+              </h1>
+            </div>
+            <p className="text-gray-600 text-base font-medium">
+              Your AI Workforce
+            </p>
           </div>
 
-          {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="you@company.com"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="••••••••"
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
-                {error}
+          {/* Form Section */}
+          <div className="px-8 py-8">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email Field */}
+              <div>
+                <label 
+                  htmlFor="email" 
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  className="block w-full px-4 py-3.5 text-base border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="you@company.com"
+                  style={{ minWidth: '100%' }}
+                />
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-600 mb-3 font-medium">Demo Accounts:</p>
-            <div className="space-y-2 text-xs text-gray-500">
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="font-medium text-gray-700">Owner Dashboard:</p>
-                <p className="font-mono">owner@aimforce.cloud</p>
-                <p className="font-mono">aimforce2026</p>
+              {/* Password Field */}
+              <div>
+                <label 
+                  htmlFor="password" 
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  className="block w-full px-4 py-3.5 text-base border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="••••••••"
+                  style={{ minWidth: '100%' }}
+                />
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="font-medium text-gray-700">Client Portal:</p>
-                <p className="font-mono">demo1@company.com</p>
-                <p className="font-mono">demo2026</p>
+
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+                  {error}
+                </div>
+              )}
+
+              {/* Sign In Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="block w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-base font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
+                style={{ minWidth: '100%', whiteSpace: 'nowrap' }}
+              >
+                {loading ? 'Signing in...' : 'Sign In'}
+              </button>
+            </form>
+          </div>
+
+          {/* Demo Credentials Section */}
+          <div className="px-8 pb-8 pt-6 border-t border-gray-100 bg-gray-50/50">
+            <p className="text-sm text-gray-700 font-semibold mb-4">
+              Demo Accounts:
+            </p>
+            
+            <div className="space-y-3">
+              {/* Owner Account */}
+              <div className="bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 transition-colors">
+                <p className="text-sm font-bold text-gray-800 mb-2">
+                  Owner Dashboard
+                </p>
+                <div className="space-y-1 text-xs font-mono text-gray-600">
+                  <p className="select-all">owner@aimforce.cloud</p>
+                  <p className="select-all">aimforce2026</p>
+                </div>
+              </div>
+
+              {/* Client Account */}
+              <div className="bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 transition-colors">
+                <p className="text-sm font-bold text-gray-800 mb-2">
+                  Client Portal
+                </p>
+                <div className="space-y-1 text-xs font-mono text-gray-600">
+                  <p className="select-all">demo1@company.com</p>
+                  <p className="select-all">demo2026</p>
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* Footer */}
+          <div className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-center">
+            <p className="text-white text-xs font-medium opacity-90">
+              24/7 AI Workforce Management Platform
+            </p>
           </div>
         </div>
+
+        {/* Powered by Note */}
+        <p className="text-center mt-6 text-sm text-gray-500">
+          Secure authentication powered by NextAuth
+        </p>
       </div>
     </div>
   )
