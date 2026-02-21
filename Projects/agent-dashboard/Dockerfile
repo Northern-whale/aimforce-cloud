@@ -28,7 +28,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Generate Prisma client
-RUN pnpm --filter web exec prisma generate
+RUN npx prisma generate --schema=apps/web/prisma/schema.prisma
 
 # Build the shared package first, then the web app
 RUN pnpm run build
