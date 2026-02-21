@@ -1,39 +1,29 @@
-# ---- Stage 1: Install dependencies ----
-FROM node:20-alpine AS deps
+# ---- Stage 1: Build ----
+FROM node:20-alpine AS builder
 RUN apk add --no-cache libc6-compat
 RUN corepack enable && corepack prepare pnpm@10.29.3 --activate
 
 WORKDIR /app
 
-# Copy workspace config
+# Copy workspace config and lockfile first (for layer caching)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
-
-# Copy package.json files for all workspace packages
 COPY apps/web/package.json ./apps/web/
 COPY packages/shared/package.json ./packages/shared/
 
-# Install all dependencies
+# Install all dependencies (single stage avoids broken pnpm symlinks)
 RUN pnpm install --frozen-lockfile
-
-# ---- Stage 2: Build ----
-FROM node:20-alpine AS builder
-RUN corepack enable && corepack prepare pnpm@10.29.3 --activate
-
-WORKDIR /app
-
-# Copy dependencies from previous stage (pnpm hoists all deps to root node_modules)
-COPY --from=deps /app/node_modules ./node_modules
 
 # Copy all source code
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate --schema=apps/web/prisma/schema.prisma
+# Generate Prisma client and stage it at a known path for the runner
+RUN pnpm --filter web exec -- prisma generate \
+    && cp -rL $(find node_modules -path '*/.prisma/client' -type d | head -1) /tmp/prisma-client
 
 # Build the shared package first, then the web app
 RUN pnpm run build
 
-# ---- Stage 3: Production runner ----
+# ---- Stage 2: Production runner ----
 FROM node:20-alpine AS runner
 RUN apk add --no-cache libc6-compat
 
@@ -57,7 +47,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/
 
 # Copy Prisma schema and generated client
 COPY --from=builder /app/apps/web/prisma ./apps/web/prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /tmp/prisma-client ./node_modules/.prisma/client
 
 USER nextjs
 
