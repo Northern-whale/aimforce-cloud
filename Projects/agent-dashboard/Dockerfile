@@ -21,10 +21,8 @@ RUN corepack enable && corepack prepare pnpm@10.29.3 --activate
 
 WORKDIR /app
 
-# Copy dependencies from previous stage
+# Copy dependencies from previous stage (pnpm hoists all deps to root node_modules)
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules 2>/dev/null || true
-COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules 2>/dev/null || true
 
 # Copy all source code
 COPY . .
@@ -57,9 +55,9 @@ COPY --from=builder /app/apps/web/public ./apps/web/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 
-# Copy Prisma schema (needed for migrations at runtime)
+# Copy Prisma schema and generated client
 COPY --from=builder /app/apps/web/prisma ./apps/web/prisma
-COPY --from=builder /app/node_modules/.pnpm/@prisma+client*/node_modules/.prisma ./node_modules/.prisma 2>/dev/null || true
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 USER nextjs
 
