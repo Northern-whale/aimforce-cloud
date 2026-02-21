@@ -13,15 +13,26 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { type, data } = body;
+    const { type, data, businessId } = body;
 
-    console.log(`[Webhook] Received event: ${type}`, { data });
+    // Resolve business from businessId or agentId
+    let resolvedBusinessId = businessId || null;
+    if (!resolvedBusinessId && data?.agentId) {
+      const business = await prisma.business.findFirst({
+        where: { elevenlabsAgentId: data.agentId },
+        select: { id: true },
+      });
+      resolvedBusinessId = business?.id || null;
+    }
+
+    console.log(`[Webhook] Received event: ${type}`, { businessId: resolvedBusinessId, data });
 
     switch (type) {
       case "call_completed": {
         // Create call log with enhanced fields
         const call = await prisma.callLog.create({
           data: {
+            businessId: resolvedBusinessId,
             externalId: data.externalId,
             phoneNumber: data.phoneNumber,
             direction: data.direction || "inbound",
@@ -32,7 +43,7 @@ export async function POST(req: NextRequest) {
             sentiment: data.sentiment || "neutral",
             transferredTo: data.transferredTo,
             metadata: data.metadata ? JSON.stringify(data.metadata) : null,
-            
+
             // Enhanced fields
             category: data.category || inferCategory(data),
             aiResolved: data.aiResolved ?? (data.transferredTo ? false : true),
@@ -54,6 +65,7 @@ export async function POST(req: NextRequest) {
             } else if (mention.productName) {
               product = await prisma.product.findFirst({
                 where: {
+                  ...(resolvedBusinessId ? { businessId: resolvedBusinessId } : {}),
                   OR: [
                     { name: { contains: mention.productName } },
                     { brand: { contains: mention.productName } },
@@ -76,7 +88,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Auto-generate insights for certain patterns
-        await generateInsightsFromCall(call, data);
+        await generateInsightsFromCall(call, data, resolvedBusinessId);
 
         break;
       }
@@ -92,6 +104,7 @@ export async function POST(req: NextRequest) {
           },
           update: { value: data.value, metadata: data.metadata },
           create: {
+            businessId: resolvedBusinessId,
             name: data.name,
             value: data.value,
             period: data.period || "daily",
@@ -103,9 +116,9 @@ export async function POST(req: NextRequest) {
       }
 
       case "product_inquiry": {
-        // Special handler for product-specific inquiries
         await prisma.event.create({
           data: {
+            businessId: resolvedBusinessId,
             type: "product_inquiry",
             payload: JSON.stringify({
               productName: data.productName,
@@ -118,9 +131,9 @@ export async function POST(req: NextRequest) {
       }
 
       default: {
-        // Store as generic event
         await prisma.event.create({
           data: {
+            businessId: resolvedBusinessId,
             type: type || "unknown",
             payload: JSON.stringify(data),
           },
@@ -175,7 +188,7 @@ function inferIntent(data: any): string {
 }
 
 // Helper: Generate insights from call patterns
-async function generateInsightsFromCall(call: any, data: any) {
+async function generateInsightsFromCall(call: any, data: any, businessId: string | null) {
   try {
     // Check for high-value inquiries (premium products)
     if (data.category === "product_inquiry") {
@@ -183,6 +196,7 @@ async function generateInsightsFromCall(call: any, data: any) {
       if (summary.includes("behike") || summary.includes("opus") || summary.includes("премиум")) {
         await prisma.businessInsight.create({
           data: {
+            businessId,
             type: "revenue_opportunity",
             title: "Premium Product Interest",
             description: `Customer inquired about high-end cigars: ${data.summary}`,
@@ -202,6 +216,7 @@ async function generateInsightsFromCall(call: any, data: any) {
     if (data.transferred && data.category === "wholesale") {
       await prisma.businessInsight.create({
         data: {
+          businessId,
           type: "customer_interest",
           title: "Wholesale Opportunity",
           description: "Potential wholesale customer transferred to owner",

@@ -3,8 +3,40 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Business {
+  id                    String           @id @default(cuid())
+  name                  String           // Business name
+  industry              String?          // retail, restaurant, salon, medical, etc.
+  address               String?
+  phone                 String?          // Business phone number
+  website               String?
+  hours                 String?          // JSON: {"mon": "10:00-22:00", ...}
+  ownerPhone            String?          // Owner's personal phone for transfers
+  ownerEmail            String?
+  ownerTelegram         String?          // Telegram chat ID for alerts
+  elevenlabsAgentId     String?          // ElevenLabs agent ID for this business
+  twilioNumber          String?          // Assigned Twilio phone number
+  knowledgeBase         String?          // JSON: products, FAQs, policies
+  voiceId               String?          // ElevenLabs voice ID
+  greeting              String?          // Agent greeting message
+  transferTriggers      String?          // JSON array of transfer trigger keywords
+  plan                  String           @default("starter") // starter, growth, enterprise
+  status                String           @default("onboarding") // onboarding, active, paused, cancelled
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  users            User[]
+  callLogs         CallLog[]
+  products         Product[]
+  businessInsights BusinessInsight[]
+  events           Event[]
+  metrics          Metric[]
 }
 
 model User {
@@ -13,8 +45,10 @@ model User {
   name           String?
   passwordHash   String
   role           String          @default("owner")
+  businessId     String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  business       Business?       @relation(fields: [businessId], references: [id])
   conversations  Conversation[]
   socialAccounts SocialAccount[]
   scheduledPosts ScheduledPost[]
@@ -45,6 +79,7 @@ model Message {
 
 model CallLog {
   id              String           @id @default(cuid())
+  businessId      String?
   externalId      String?          @unique
   phoneNumber     String?
   direction       String
@@ -61,32 +96,45 @@ model CallLog {
   topicTags       String?          // JSON array
   customerIntent  String?          // buying, browsing, complaining, information
   createdAt       DateTime         @default(now())
-  
+
+  business        Business?        @relation(fields: [businessId], references: [id])
   productMentions ProductMention[]
+
+  @@index([businessId])
 }
 
 model Metric {
-  id        String   @id @default(cuid())
-  name      String
-  value     Float
-  period    String
-  date      DateTime
-  metadata  String?
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  businessId String?
+  name       String
+  value      Float
+  period     String
+  date       DateTime
+  metadata   String?
+  createdAt  DateTime  @default(now())
+
+  business   Business? @relation(fields: [businessId], references: [id])
 
   @@unique([name, period, date])
+  @@index([businessId])
 }
 
 model Event {
-  id        String   @id @default(cuid())
-  type      String
-  payload   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  businessId String?
+  type       String
+  payload    String
+  read       Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+
+  business   Business? @relation(fields: [businessId], references: [id])
+
+  @@index([businessId])
 }
 
 model Product {
   id              String           @id @default(cuid())
+  businessId      String?
   name            String
   brand           String
   origin          String           // Cuban, Dominican, Nicaraguan
@@ -101,8 +149,11 @@ model Product {
   category        String           // premium, standard, exclusive
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
-  
+
+  business        Business?        @relation(fields: [businessId], references: [id])
   productMentions ProductMention[]
+
+  @@index([businessId])
 }
 
 model ProductMention {
@@ -118,14 +169,19 @@ model ProductMention {
 }
 
 model BusinessInsight {
-  id          String   @id @default(cuid())
-  type        String   // trending_product, peak_hour, customer_interest, revenue_opportunity
+  id          String    @id @default(cuid())
+  businessId  String?
+  type        String    // trending_product, peak_hour, customer_interest, revenue_opportunity
   title       String
   description String
-  data        String?  // JSON metadata
-  priority    String   @default("normal") // low, normal, high
-  actionable  Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  data        String?   // JSON metadata
+  priority    String    @default("normal") // low, normal, high
+  actionable  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  business    Business? @relation(fields: [businessId], references: [id])
+
+  @@index([businessId])
 }
 
 model SocialAccount {

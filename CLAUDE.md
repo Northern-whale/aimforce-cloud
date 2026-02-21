@@ -16,7 +16,8 @@ Tars/
 ├── .env                    # Environment variables (secret - never commit)
 ├── .env.template           # Template for env vars
 ├── Projects/               # Sub-projects
-│   ├── n8n-mcp/            # n8n MCP Server (TypeScript, main codebase)
+│   ├── agent-dashboard/    # AIMForce platform (Next.js, Prisma, NextAuth v5) — the single app
+│   ├── n8n-mcp/            # n8n MCP Server (TypeScript)
 │   └── Cigar-Shop-AI-Agent/ # AI agent project for cigar shop (n8n workflows + prompts)
 ├── docs/                   # Documentation (setup guides, examples, analysis)
 ├── templates/              # Workflow templates
@@ -26,8 +27,11 @@ Tars/
 
 ## Sub-Projects
 
+### agent-dashboard (`Projects/agent-dashboard/`)
+The main platform. A turborepo monorepo (Next.js 16, Prisma 6, NextAuth v5) with multi-business support, call management, product inventory, AI chat, social media automation, analytics, and n8n webhook integration. Includes Langfuse for LLM observability.
+
 ### n8n-mcp (`Projects/n8n-mcp/`)
-The main codebase. A TypeScript MCP server providing AI assistants access to n8n node information. Has its own `CLAUDE.md` with detailed architecture, commands, and development guidelines. Refer to that file when working in that directory.
+A TypeScript MCP server providing AI assistants access to n8n node information. Has its own `CLAUDE.md` with detailed architecture, commands, and development guidelines. Refer to that file when working in that directory.
 
 ### Cigar-Shop-AI-Agent (`Projects/Cigar-Shop-AI-Agent/`)
 An AI-powered customer service agent for a cigar shop, built with n8n workflows and ElevenLabs voice integration.

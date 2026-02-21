@@ -11,11 +11,15 @@ import {
   Package,
   TrendingUp,
   Share2,
+  Building2,
+  UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/businesses", label: "Businesses", icon: Building2 },
+  { href: "/onboarding", label: "New Client", icon: UserPlus },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/calls", label: "Calls", icon: Phone },
   { href: "/products", label: "Products", icon: Package },

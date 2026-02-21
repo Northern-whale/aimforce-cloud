@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { streamChatResponse } from "@/lib/claude";
+import { langfuse } from "@/lib/langfuse";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -57,6 +58,17 @@ export async function POST(req: NextRequest) {
 
   const startTime = Date.now();
 
+  const trace = langfuse.trace({
+    name: "chat",
+    userId: session.user.id,
+    metadata: { conversationId, inputMethod },
+  });
+  const generation = trace.generation({
+    name: "claude-stream",
+    input: messages,
+    model: "claude-sonnet-4-5-20250514",
+  });
+
   // Stream response from Claude
   const stream = await streamChatResponse(messages);
 
@@ -100,10 +112,19 @@ export async function POST(req: NextRequest) {
           data: { updatedAt: new Date() },
         });
 
+        generation.end({
+          output: fullResponse,
+          usage: {
+            input: finalMessage.usage.input_tokens,
+            output: finalMessage.usage.output_tokens,
+          },
+        });
+
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       } catch (error) {
         console.error("Stream error:", error);
+        generation.end({ metadata: { error: String(error) } });
         controller.enqueue(
           encoder.encode(
             `data: ${JSON.stringify({ error: "Stream error" })}\n\n`
